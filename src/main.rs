@@ -88,7 +88,7 @@ frame.render_widget(
 frame.render_widget(
     Paragraph::new("
     Gina: Viva
-    Piero: Morta
+    Piero: Morto
     Gianpiero: Vivo per poco").style(Style::new().white())
         .block(Block::default().title("Stato Piante").borders(Borders::ALL)).style(Style::new().green()),
     layout_bello[1]
