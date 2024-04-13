@@ -1,13 +1,13 @@
-use ratatui::{prelude::*, widgets::*};
-
-use std::io::{self, stdout};
-
 use crossterm::{
     event::{self, Event, KeyCode},
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
     ExecutableCommand,
 };
 use ratatui::{prelude::*, widgets::*};
+use ratatui::{prelude::*, widgets::*};
+use reqwest;
+use std::error::Error;
+use std::io::{self, stdout};
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
@@ -24,6 +24,57 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
+#[tokio::main]
+async fn send1() {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://webhook.site/0b66bf02-6d1a-408f-9e90-608f3a40e7b0")
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await;
+}
+#[tokio::main]
+
+async fn send2() {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://webhook.site/7ce6912c-d287-42b8-9327-b8d609efe71f")
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await;
+}
+#[tokio::main]
+
+async fn send3() {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://webhook.site/f74ec52f-b5fb-4df5-aac5-5aa3359a11f3")
+        // confirm the request using send()
+        .send()
+        .await
+        // the rest is the same!
+        .unwrap()
+        .text()
+        .await;
+}
+
+async fn toggle_led() {
+    let client = reqwest::Client::new();
+    let response = client
+        .get("https://webhook.site/f74ec52f-b5fb-4df5-aac5-5aa3359a11f3")
+        // confirm the request using send()
+        .send()
+        .await
+        // the rest is the same!
+        .unwrap()
+        .text()
+        .await;
+}
+
 fn handle_events() -> io::Result<bool> {
     if event::poll(std::time::Duration::from_millis(50))? {
         if let Event::Key(key) = event::read()? {
@@ -33,14 +84,22 @@ fn handle_events() -> io::Result<bool> {
             if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('1') {
                 println!("Faccio partire il robot...");
                 println!("\nPremi <e> per continuare");
+                send1();
             }
             if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('2') {
                 println!("Fermo il robot...");
                 println!("\nPremi <e> per continuare");
+                send2();
             }
             if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('3') {
                 println!("Innaffio le piante...");
                 println!("\nPremi <e> per continuare");
+                send3();
+            }
+            if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('4') {
+                println!("Done.");
+                println!("\nPremi <e> per continuare");
+                toggle_led();
             }
             if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('e') {
                 main();
@@ -70,7 +129,10 @@ fn ui(frame: &mut Frame) {
 
     let inner_layout = Layout::new(
         Direction::Horizontal,
-        [Constraint::Percentage(33), Constraint::Percentage(33), Constraint::Percentage(33)],
+        [
+            Constraint::Percentage(55),
+            Constraint::Percentage(45),
+        ],
     )
     .split(main_layout[1]);
 
@@ -102,7 +164,8 @@ fn ui(frame: &mut Frame) {
  1. Fai partire il robot
  2. Ferma il robot
  3. Innaffia le piante
-                 
+ 4. toggle_led 
+
  Seleziona una delle opzioni (1,2,3):",
         )
         .white()
@@ -120,14 +183,17 @@ fn ui(frame: &mut Frame) {
    piante e stato delle piante...",
         )
         .style(Style::new().white())
-        .block(Block::default().title("Stato Piante").borders(Borders::ALL).green())
+        .block(
+            Block::default()
+                .title("Stato Piante")
+                .borders(Borders::ALL)
+                .green(),
+        )
         .style(Style::new().white()),
         layout_bello[1],
     );
-    frame.render_widget(Paragraph::new("Press <q> to quit   Press <e> to refresh").cyan(), main_layout[2]);
-    frame.render_widget(Paragraph::new("")
-    .style(Style::new().white())
-    .block(Block::default().title("Console").borders(Borders::ALL).green())
-    .style(Style::new().white())
-    , inner_layout[2])
+    frame.render_widget(
+        Paragraph::new("Press <q> to quit   Press <e> to refresh").cyan(),
+        main_layout[2],
+    );
 }
