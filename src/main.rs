@@ -4,9 +4,7 @@ use crossterm::{
     ExecutableCommand,
 };
 use ratatui::{prelude::*, widgets::*};
-use ratatui::{prelude::*, widgets::*};
-use reqwest;
-use std::error::Error;
+use reqwest::*;
 use std::io::{self, stdout};
 
 fn main() -> io::Result<()> {
@@ -26,7 +24,7 @@ fn main() -> io::Result<()> {
 
 #[tokio::main]
 async fn send1() {
-    let client = reqwest::Client::new();
+    let client = Client::new();
     let response = client
         .get("https://webhook.site/0b66bf02-6d1a-408f-9e90-608f3a40e7b0")
         .send()
@@ -61,11 +59,11 @@ async fn send3() {
         .text()
         .await;
 }
-
+#[tokio::main]
 async fn toggle_led() {
     let client = reqwest::Client::new();
     let response = client
-        .get("https://webhook.site/f74ec52f-b5fb-4df5-aac5-5aa3359a11f3")
+        .get("http://127.0.0.1:8000/toggle_led")
         // confirm the request using send()
         .send()
         .await
@@ -73,6 +71,7 @@ async fn toggle_led() {
         .unwrap()
         .text()
         .await;
+    println!("{:?}", response);
 }
 
 fn handle_events() -> io::Result<bool> {
