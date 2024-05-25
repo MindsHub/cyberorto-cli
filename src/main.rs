@@ -7,6 +7,12 @@ use ratatui::{prelude::*, widgets::*};
 use reqwest::*;
 use std::io::{self, stdout};
 
+pub const BASE_URL: &str = "https://webhook.site";
+
+fn url_join(segments: Vec<&str>) -> String {
+    return segments.join("/");
+}
+
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
     stdout().execute(EnterAlternateScreen)?;
@@ -26,7 +32,10 @@ fn main() -> io::Result<()> {
 async fn send1() {
     let client = Client::new();
     let response = client
-        .get("https://webhook.site/0b66bf02-6d1a-408f-9e90-608f3a40e7b0")
+        .get(url_join(vec![
+            BASE_URL,
+            "1a77d6aa-450d-42bd-88cb-1e9520746786",
+        ]))
         .send()
         .await
         .unwrap()
@@ -38,7 +47,10 @@ async fn send1() {
 async fn send2() {
     let client = reqwest::Client::new();
     let response = client
-        .get("https://webhook.site/7ce6912c-d287-42b8-9327-b8d609efe71f")
+        .get(url_join(vec![
+            BASE_URL,
+            "1a77d6aa-450d-42bd-88cb-1e9520746786",
+        ]))
         .send()
         .await
         .unwrap()
@@ -50,7 +62,10 @@ async fn send2() {
 async fn send3() {
     let client = reqwest::Client::new();
     let response = client
-        .get("https://webhook.site/f74ec52f-b5fb-4df5-aac5-5aa3359a11f3")
+        .get(url_join(vec![
+            BASE_URL,
+            "1a77d6aa-450d-42bd-88cb-1e9520746786",
+        ]))
         // confirm the request using send()
         .send()
         .await
@@ -103,11 +118,31 @@ fn handle_events() -> io::Result<bool> {
             if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('e') {
                 main();
             }
+            if key.kind == event::KeyEventKind::Press && key.code == KeyCode::Char('z') {
+                get_request();
+                println!("\nPremi <e> per continuare");
+            }
         }
     }
     Ok(false)
 }
+#[tokio::main]
+async fn get_request() {
+    let response = reqwest::get("https://webhook.site/93d0c9cc-4e21-4f88-aa91-5c5caa7ec935")
+        .await
+        .unwrap()
+        .text()
+        .await;
+    println!("{:?}", response);
+}
 
+const status: &str = "
+        (stato robot, raspberry e altro)";
+
+const position: &str = "
+    x:
+    y:               
+    z:";
 fn ui(frame: &mut Frame) {
     let main_layout = Layout::new(
         Direction::Vertical,
@@ -128,10 +163,7 @@ fn ui(frame: &mut Frame) {
 
     let inner_layout = Layout::new(
         Direction::Horizontal,
-        [
-            Constraint::Percentage(55),
-            Constraint::Percentage(45),
-        ],
+        [Constraint::Percentage(55), Constraint::Percentage(45)],
     )
     .split(main_layout[1]);
 
@@ -141,36 +173,46 @@ fn ui(frame: &mut Frame) {
     )
     .split(inner_layout[0]);
 
+    let position_layout = Layout::new(
+        Direction::Horizontal,
+        [Constraint::Percentage(50), Constraint::Percentage(50)],
+    )
+    .split(layout_bello[0]);
+
     frame.render_widget(
-        Paragraph::new(
-            " Stato:
-     Server:   OK       Robot: In Funzione
-     Internet: OK
-     Client:   OK",
-        )
-        .white()
-        .block(
+        Paragraph::new(status).white().block(
             Block::default()
-                .title("Informazioni")
+                .title("Stato")
                 .borders(Borders::ALL)
                 .light_green(),
         ),
-        inner_layout[0],
+        position_layout[0],
     );
+
+    frame.render_widget(
+        Paragraph::new(position).white().block(
+            Block::default()
+                .title("Posizione")
+                .borders(Borders::ALL)
+                .light_green(),
+        ),
+        position_layout[1],
+    );
+
     frame.render_widget(
         Paragraph::new(
             "    
- 1. Fai partire il robot
- 2. Ferma il robot
- 3. Innaffia le piante
- 4. toggle_led 
+  1. Fai partire il robot
+  2. Ferma il robot
+  3. Innaffia le piante
+  4. toggle_led 
 
- Seleziona una delle opzioni (1,2,3):",
+  Seleziona una delle azioni (1,2,3):",
         )
         .white()
         .block(
             Block::default()
-                .title("Opzioni")
+                .title("Azioni")
                 .borders(Borders::ALL)
                 .light_green(),
         ),
@@ -178,8 +220,10 @@ fn ui(frame: &mut Frame) {
     );
     frame.render_widget(
         Paragraph::new(
-            "
-   piante e stato delle piante...",
+            " 
+ 🌷 🌷 🌷 🌷 🌷 🌷 🌷     🌷 = Tulipano Rosa    💧 💧 💧 💧 💧 💧 💧      💧 = Innaffiata
+ 🌻 🌻 🌻 🌻 🌻 🌻 🌻     🌻 = Girasole         💧 💧 💧 💧 🔥 🔥 🔥      🔥 = Non innaffiata
+ 🥀 🥀 🌷 🥀 🌷 🌷 🥀     🥀 = Morta            🔥 🔥 💧 💧 💧 💧 🔥                                          ",
         )
         .style(Style::new().white())
         .block(
