@@ -12,3 +12,6 @@ reqwest = { version = "0.11", features = ["json", "blocking"] } # reqwest with J
 futures = "0.3" # for our async / await blocks
 tokio = { version = "1.12.0", features = ["full"] } # for our async runtime
 tui-prompts = "0.3.10"
+derive_setters = "0.1.6"
+lipsum = "0.9.1"
+tui-textarea = "0.4.0"
