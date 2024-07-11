@@ -1,4 +1,5 @@
 # Cyberorto-cli
 A tui for Cyberorto
 
-![example](https://github.com/MindsHub/cyberorto-cli/assets/129979159/9c3c4a96-958c-4da3-ab66-fdc3d96f40b9)
+
+![Screenshot 2024-07-11 at 22 36 58](https://github.com/user-attachments/assets/925098c7-d336-439e-83d7-62fc01a69e13)
